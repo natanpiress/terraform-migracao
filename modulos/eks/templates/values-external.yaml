@@ -1,0 +1,8 @@
+domainFilters: [
+  ${domain}
+]
+provider: aws
+
+extraArgs: [
+ "--aws-zone-type=public"
+]

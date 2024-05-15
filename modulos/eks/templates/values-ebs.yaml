@@ -1,0 +1,40 @@
+image:
+  repository: "602401143452.dkr.ecr.${aws_region}.amazonaws.com/eks/aws-ebs-csi-driver"
+  tag: ""
+  pullPolicy: IfNotPresent
+
+controller:
+ 
+  defaultFsType: ext4
+  nodeSelector: {}
+  k8sTagClusterId: ${cluster_name}
+
+  region: ${aws_region}
+  replicaCount: 2
+  resources:
+    requests:
+      cpu: 10m
+      memory: 40Mi
+    limits:
+      memory: 256Mi
+  serviceAccount:
+  # A service account will be created for you if set to true. Set to false if you want to use your own.
+    create: true
+    name: ebs-csi-controller-sa
+    annotations: 
+      eks.amazonaws.com/role-arn: ${aws_arn_ebs}
+    automountServiceAccountToken: true
+
+storageClasses:
+# Add StorageClass resources like:
+- name: gp3
+  provisioner: kubernetes.io/aws-ebs
+  volumeBindingMode: WaitForFirstConsumer
+  annotations:
+     storageclass.kubernetes.io/is-default-class: "true"
+  parameters:
+    type: gp3
+    fsType: ext4
+## annotation metadata
+#   annotations:
+#     storageclass.kubernetes.io/is-default-class: "true"

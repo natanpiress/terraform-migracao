@@ -1,0 +1,68 @@
+replicaCount: 2
+
+image:
+  repository: 602401143452.dkr.ecr.${aws_region}.amazonaws.com/eks/aws-efs-csi-driver
+  tag: "v1.5.9"
+  pullPolicy: IfNotPresent
+
+## Controller deployment variables
+
+controller:
+  nodeSelector: {}
+  tolerations: []
+  # Specifies whether a service account should be created
+  serviceAccount:
+    create: true
+    name: efs-csi-controller-sa
+    annotations: 
+       eks.amazonaws.com/role-arn: ${aws_arn_efs}
+    ## Enable if EKS IAM for SA is used
+    #  eks.amazonaws.com/role-arn: arn:aws:iam::111122223333:role/efs-csi-role
+
+node:
+  resources:
+    {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+  nodeSelector: {}
+  tolerations:
+    - operator: Exists
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: eks.amazonaws.com/compute-type
+                operator: NotIn
+                values:
+                  - fargate
+  # Specifies whether a service account should be created
+  serviceAccount:
+    create: true
+    name: efs-csi-node-sa
+    annotations: 
+      eks.amazonaws.com/role-arn: ${aws_arn_efs}
+    ## Enable if EKS IAM for SA is used
+    #  eks.amazonaws.com/role-arn: arn:aws:iam::111122223333:role/efs-csi-role
+
+storageClasses: 
+# Add StorageClass resources like:
+ - name: efs-sc
+#   annotations:
+#     # Use that annotation if you want this to your default storageclass
+#     storageclass.kubernetes.io/is-default-class: "true"
+#   mountOptions:
+#   - tls
+   parameters:
+     provisioningMode: efs-ap
+     fileSystemId: ${filesystem_id}
+     directoryPerms: "700"
+     gidRangeStart: "1000"
+     gidRangeEnd: "2000"
+     basePath: "/dynamic_provisioning"
+   reclaimPolicy: Delete
+   volumeBindingMode: WaitForFirstConsumer

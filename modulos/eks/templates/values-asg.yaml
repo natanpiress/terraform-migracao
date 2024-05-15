@@ -1,0 +1,60 @@
+autoDiscovery:
+  clusterName: ${cluster_name}
+
+# awsRegion -- AWS region (required if `cloudProvider=aws`)
+awsRegion: ${aws_region}
+
+extraArgs:
+  logtostderr: true
+  stderrthreshold: info
+  v: 4
+  skip-nodes-with-local-storage: false
+  skip-nodes-with-system-pods: false
+  expander: least-waste
+  balance-similar-node-groups: true
+  scale-down-delay-after-add: 2m
+  scale-down-unneeded-time: 2m
+  # write-status-configmap: true
+  # status-config-map-name: cluster-autoscaler-status
+  # leader-elect: true
+  # leader-elect-resource-lock: endpoints
+  # skip-nodes-with-local-storage: true
+  # expander: random
+  # scale-down-enabled: true
+  # balance-similar-node-groups: true
+  # min-replica-count: 0
+  # scale-down-utilization-threshold: 0.5
+  # scale-down-non-empty-candidates-count: 30
+  # max-node-provision-time: 15m0s
+  # scan-interval: 10s
+  # scale-down-delay-after-add: 10m
+  # scale-down-delay-after-delete: 0s
+  # scale-down-delay-after-failure: 3m
+  # scale-down-unneeded-time: 10m
+  # skip-nodes-with-system-pods: true
+  # balancing-ignore-label_1: first-label-to-ignore
+  # balancing-ignore-label_2: second-label-to-ignore
+
+image:
+  repository: registry.k8s.io/autoscaling/cluster-autoscaler
+  tag: v${version_k8s}.0
+
+nodeSelector: {}
+
+rbac:
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: ${aws_arn_asg}
+    create: true
+
+replicaCount: 2
+
+resources: 
+   limits:
+     cpu: 100m
+     memory: 300Mi
+   requests:
+     cpu: 100m
+     memory: 300Mi
+
+tolerations: []

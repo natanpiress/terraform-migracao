@@ -1,0 +1,16 @@
+replicas: 1
+minimumMasterNodes: 1
+
+image: "854365144307.dkr.ecr.eu-central-1.amazonaws.com/elasticsearch"
+imagePullPolicy: "IfNotPresent"
+
+resources:
+  requests:
+    cpu: "1000m"
+    memory: "2Gi"
+  limits:
+    cpu: "1000m"
+    memory: "2Gi"
+
+persistence:
+  enabled: false
